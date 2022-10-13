@@ -1,9 +1,6 @@
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
 import json
-# import sys
-# sys.setrecursionlimit(2000)
-
 
 class Scheme():
 	def __init__(self, filename):
@@ -13,6 +10,7 @@ class Scheme():
 		self.scheme.set('xmlns:xs', "http://www.w3.org/2001/XMLSchema")
 		self.scheme.set('attributeFormDefault', "unqualified")
 		self.scheme.set('elementFormDefault', "qualified")
+		self.document = minidom.parseString(ET.tostring(self.xml))
 
 	@staticmethod
 	def get_xs_type(text):
@@ -32,7 +30,6 @@ class Scheme():
 			if xml_element.text.strip() != "":
 				new_element.set("type", self.get_xs_type(xml_element.text))
 
-
 			def filterChilds(arr):
 				return list(
 					filter(
@@ -51,7 +48,7 @@ class Scheme():
 
 			children = filterChilds(minidom.parseString(ET.tostring(xml_element)).childNodes[0].childNodes)
 
-			parrent = minidom.parseString(ET.tostring(self.xml)).getElementsByTagName(xml_element.tag)[0].parentNode
+			parrent = self.document.getElementsByTagName(xml_element.tag)[0].parentNode
 			if notUnique(filterChilds(parrent.childNodes)):
 				new_element.set("maxOccurs", "unbounded")
 				new_element.set("minOccurs", "0")
